@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabu Oyunu</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        .timer { font-size: 2em; margin-bottom: 20px; }
+        .score { font-size: 1.5em; margin-bottom: 20px; }
+        .word-box, .forbidden-box { font-size: 1.5em; border: 1px solid #000; padding: 20px; margin-bottom: 20px; }
+        .controls button { margin: 5px; padding: 10px 20px; }
+    </style>
+</head>
+<body>
+    <body style="background-image: url('images/lemanbc.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+
+    <div class="timer" id="timer">60</div>
+    <div class="score" id="score">Puan: 0</div>
+    <div class="word-box" id="word-box">Yeni söz burada görünəcək</div>
+    <div class="forbidden-box" id="forbidden-box">Yasaklı kelimeler burada görünəcək</div>
+
+    <div class="controls">
+        <button onclick="nextWord()">Sonraki Kelime</button>
+        <button onclick="addScore()">Doğru Bildim</button>
+        <button onclick="resetGame()">Oyunu Yenile</button>
+    </div>
+
+    <script>
+        let words = [
+            { word: 'Kitab', forbidden: ['oxumaq', 'səhifə', 'məktəb', 'yazı', 'nəşr'] },
+            { word: 'Telefon', forbidden: ['əlaqə', 'zəng', 'mesaj', 'mobil', 'smartfon'] },
+            { word: 'Qələm', forbidden: ['yazmaq', 'dəftər', 'karandaş', 'sənəd', 'rəng'] },
+            { word: 'Maşın', forbidden: ['sürmək', 'yol', 'təkər', 'motor', 'avtomobil'] },
+            { word: 'Ev', forbidden: ['kira', 'otaq', 'divar', 'yemək', 'mənzil'] },
+            { word: 'Müzik', forbidden: ['mahnı', 'melodiya', 'səsləndirmək', 'alət', 'konsert'] },
+            { word: 'Hava', forbidden: ['günəş', 'bulud', 'yağmur', 'külək', 'isti'] },
+            { word: 'Dəniz', forbidden: ['suyun', 'dalğa', 'gəmi', 'üzmək', 'açıq'] },
+            { word: 'Gün', forbidden: ['sabah', 'şəfəq', 'gecə', 'saat', 'işıq'] },
+            { word: 'Şəxs', forbidden: ['adam', 'insan', 'dost', 'ailə', 'birey'] },
+            { word: 'Qış', forbidden: ['soyuq', 'qarla', 'yağmur', 'çovğun', 'güz'] },
+            { word: 'Gül', forbidden: ['çiçək', 'rüzgar', 'bahar', 'baxmaq', 'xoş'] },
+            { word: 'Pide', forbidden: ['yemək', 'fırın', 'çiğ', 'tost', 'çörək'] },
+            { word: 'Araba', forbidden: ['sürmək', 'yol', 'təkər', 'motor', 'avtomobil'] },
+            { word: 'Şair', forbidden: ['qəzet', 'kitab', 'yazı', 'oxuma', 'düşünmək'] },
+            { word: 'Gəmi', forbidden: ['dəniz', 'səyahət', 'kapitan', 'yelkən', 'üzmək'] },
+            { word: 'Sinif', forbidden: ['məktəb', 'daş', 'sil', 'söz', 'yazı'] },
+            { word: 'Sürünmək', forbidden: ['sürmək', 'qatara', 'başla', 'diş', 'qısa'] },
+            { word: 'Dost', forbidden: ['yakın', 'sırdaş', 'gizli', 'arkadaş', 'təsir'] },
+            { word: 'Bakı', forbidden: ['paytaxt', 'şəhər', 'Qafqaz', 'dəmir', 'dəniz'] },
+            { word: 'Meyvə', forbidden: ['alma', 'tat', 'şirin', 'süfrə', 'qida'] },
+            { word: 'Xəstəxana', forbidden: ['doktor', 'müalicə', 'sənəd', 'tibb', 'təcil'] },
+            { word: 'Müəllim', forbidden: ['məktəb', 'dərs', 'təhsil', 'şagird', 'bilgi'] },
+            { word: 'Günəş', forbidden: ['səhər', 'işıq', 'gün', 'dəqiqə', 'sıx'] },
+            { word: 'Hekayə', forbidden: ['oyun', 'söz', 'axar', 'təbəqə', 'gündəlik'] },
+            { word: 'Yağmur', forbidden: ['su', 'bulud', 'yağış', 'qış', 'soyuq'] },
+            { word: 'Buz', forbidden: ['soyuq', 'su', 'buz', 'qısa', 'kətan'] },
+            { word: 'Quş', forbidden: ['uçmaq', 'yumurta', 'qısa', 'ağaç', 'göy'] },
+            { word: 'Şükür', forbidden: ['Haq', 'minlərlə', 'müşki', 'diş', 'silsil'] },
+            { word: 'Rüzgar', forbidden: ['külək', 'havalandırmaq', 'təbiət', 'fırtına', 'sərin'] },
+            { word: 'Ailə', forbidden: ['baba', 'ananə', 'valideyn', 'uşaq', 'qardaş'] },
+            { word: 'Köy', forbidden: ['qəsəbə', 'qırx', 'meşə', 'yol', 'təbiət'] },
+            { word: 'Kitabxana', forbidden: ['kitab', 'oxumaq', 'səhifə', 'sakit', 'şəkil'] },
+            { word: 'Şəkil', forbidden: ['foto', 'çəkmək', 'rəsim', 'tuval', 'qrafika'] },
+            { word: 'Suda', forbidden: ['üzmək', 'suyu', 'göl', 'yarım', 'qaba'] },
+            { word: 'Çiçək', forbidden: ['gül', 'baxmaq', 'yaşıl', 'bahar', 'kəpənək'] },
+            { word: 'Hava', forbidden: ['günəş', 'bulud', 'yağmur', 'külək', 'isti'] }
+        ];
+
+        let currentWordIndex = 0;
+        let score = 0;
+        let timer = 60;
+        let timerInterval;
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (timer > 0) {
+                    timer--;
+                    document.getElementById('timer').textContent = timer;
+                } else {
+                    clearInterval(timerInterval);
+                    alert('Zaman bitdi! Oyunu yenilemek için "Oyunu Yenile" butonuna basın.');
+                }
+            }, 1000);
+        }
+
+        function getRandomWord() {
+            currentWordIndex = Math.floor(Math.random() * words.length);
+            document.getElementById('word-box').textContent = words[currentWordIndex].word;
+            document.getElementById('forbidden-box').textContent = 'Yasaklı kelimeler: ' + words[currentWordIndex].forbidden.join(', ');
+        }
+
+        function nextWord() {
+            if (currentWordIndex < words.length) {
+                getRandomWord();
+            } else {
+                alert('Bütün sözlər bitdi!');
+            }
+        }
+
+        function addScore() {
+            score++;
+            document.getElementById('score').textContent = 'Puan: ' + score;
+            getRandomWord();
+        }
+
+        function resetGame() {
+            clearInterval(timerInterval);
+            timer = 60;
+            score = 0;
+            currentWordIndex = 0;
+            document.getElementById('timer').textContent = timer;
+            document.getElementById('score').textContent = 'Puan: 0';
+            document.getElementById('word-box').textContent = 'Yeni söz burada görünəcək';
+            document.getElementById('forbidden-box').textContent = 'Yasaklı kelimeler burada görünəcək';
+            startTimer();
+            getRandomWord();
+        }
+
+        // Oyunu başlat
+        startTimer();
+        getRandomWord();
+    </script>
+
+</body>
+</html>

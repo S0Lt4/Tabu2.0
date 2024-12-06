@@ -1,0 +1,19 @@
+body {
+    background-image: url('images/lemanbc.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+body {
+    background-image: url('images/arka-plan-resmi.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    color: white; /* Yazı rengi */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Gölge efekti */
+}
+body {
+    border: 2px solid #fff; /* Beyaz kenar çerçevesi */
+    padding: 10px;
+}
+
